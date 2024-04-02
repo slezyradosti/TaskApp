@@ -1,0 +1,63 @@
+﻿@using Umbraco.Cms.Web.Common.PublishedModels;
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage;
+@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
+@{
+	Layout = "Layout.cshtml";
+}
+
+<div class="row justify-content-center">
+    <div class="col-6" style="width: 70%">
+        <div class="form">
+            <div class="form-group mb-2">
+                <label >Username</label>
+                <input type="email" class="form-control" id="username" aria-describedby="emailHelp" placeholder="username">
+            </div>
+            <div class="form-group mb-3">
+                <label >Password</label>
+                <input type="password" class="form-control" id="password" placeholder="password">
+            </div>
+            <div>
+                <button type="submit" onclick="login()" class="btn btn-primary">Submit</button>
+            </div>
+            <div class="mt-2">
+                <p id="resultMessage"></p>
+                <p id="resultData"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function login() {
+        let username = $("#username").val();
+        let password = $("#password").val();
+
+        var soapMessage = '<?xml version="1.0" encoding="utf-8"?>\
+                                < soap: Envelope xmlns: soap = "http://schemas.xmlsoap.org/soap/envelope/" >\
+                                    <soap: Body>\
+                                        <Login>\
+                                            <UserName>' + username + '</UserName>\
+                                                < Password >' + password + '< /Password>\
+                                                < IPs > 1 < /IPs>\
+                                        < /Login>\
+                                     < /soap:Body>\
+                                < /soap:Envelope>\
+                                ';
+
+        $.ajax({
+            url: "http://isapi.icu-tech.com/icutech-test.dll/soap/IICUTech",
+            type: 'POST',
+            contentType: "application/xml",
+            dataType: "xml",
+            data: soapMessage,
+            success: function (result) {
+                $('#resultMessage').html("<label style='color: green'>Success<label/>")
+                $('#resultData').html("<label> Data: " + result + "<label/>")
+            },
+            error: function (errormessage) {
+                $('#resultMessage').html("<label style='color: red'>" + "Error: " + errormessage.responseText + "<label/>")
+                $('#resultData').html("<label><label/>");
+            }
+        });
+    }
+</script>
